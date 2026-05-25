@@ -19,3 +19,18 @@ less than 6 pages to:
 - *b)* Describe how to install and run the two programs step by step in a readme.txt file. *6 marks* (3 marks per explaination - bundle our sources and tar it up and then say run this)
 - *c)* Report the training and test results including the max, min, average accuract and the standard deviation obtained from the 10 runs and the running time of each program. *10 marks* (State because next question is compare and discuss)
 - *d)* Compare and discuss the results of the two models *12 marks* (assume its around 6 marks per or it could be 3 per model and 6 for comparitive points)
+
+## Dataset Overview
+The KDD dataset contains a standard set of data which includes a wide
+variety of intrusions simulated in a military network environment. It has
+2 classes, normal connection and anomaly connection (ie. attack), and 41
+features (duration, protocol type, service, flag, src bytes, dst bytes, land,
+wrong fragment, urgent, hot, num failed logins, logged in,
+num compromised, root shell, su attempted, num root, num file creations,
+num shells, num access files, num outbound cmds, is host login,
+is guest login, count, srv count, serror rate, srv serror rate, rerror rate,
+srv rerror rate, same srv rate, diff srv rate, srv diff host rate, dst host count,
+dst host srv count, dst host same srv rate, dst host diff srv rate,
+dst host same src port rate, dst host srv diff host rate, dst host serror rate,
+dst host srv serror rate, dst host rerror rate, dst host srv rerror rate). You
+can get [more information about this dataset](https://kdd.ics.uci.edu/databases/kddcup99/task.html)
