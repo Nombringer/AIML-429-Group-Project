@@ -4,3 +4,6 @@
 - Fabian
 - Jason
 - Bex
+
+## Details
+All code used in the Group Portion of the Assignment will appear in this repository.
