@@ -19,6 +19,7 @@ kinit_check:
 	fi; \
 	klist -s || (echo "No valid kerberos token, run kinit" && exit 1)
 
+
 hdfs_check:
 	@echo "Checking HDFS"
 	@if [ "$(ENV)" != "ecs" ]; then \
@@ -233,6 +234,47 @@ $(DT_OUTPUT): $(DT_HDFS_SENTINEL) $(DT_PUSH_SENTINEL) $(DT_EXEC) | $(DT_CHECK)
 	cat $(DT_OUTPUT_DIR)/*.csv
 	touch $(DT_OUTPUT)
 
+#Logistic Regression, currently local only
+
+LR_NAME=LogisticRegression
+LR_BIN_DIR=$(LR_NAME)/bin
+LR_INPUT_DIR=$(LR_NAME)/input
+LR_OUTPUT_DIR=$(LR_NAME)/output
+LR_SENTINEL_DIR=$(LR_NAME)/sentinel
+LR_EXEC=$(LR_BIN_DIR)/$(LR_NAME).py
+LR_INPUT=$(wildcard $(LR_INPUT_DIR)/*)
+LR_OUTPUT=$(LR_OUTPUT_DIR)/$(LR_NAME).output
+LR_HDFS_SENTINEL=$(LR_SENTINEL_DIR)/hdfs_path_created
+LR_PUSH_SENTINEL=$(LR_SENTINEL_DIR)/input_pushed
+LR_SENTINELS=$(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL)
+LR_CHECK=$(LR_NAME)_check
+LR_NUM_RUNS=10
+
+$(LR_CHECK): | kinit_check hdfs_check spark_check
+
+LR_STAGED_OUTPUT_DIR=$(LR_NAME)/staged_output
+
+local_$(LR_NAME):
+	echo "LOCAL - Submitting $(LR_EXEC)"
+	-rm $(LR_STAGED_OUTPUT_DIR)/*
+	-rm $(LR_STAGED_OUTPUT_DIR)/.*
+	-rmdir $(LR_STAGED_OUTPUT_DIR)
+	spark-submit --name $(LR_NAME) \
+		  --master "local[*]"  \
+		  $(LR_EXEC) \
+		  $(LR_NUM_RUNS) \
+		  $(LR_INPUT) \
+		  $(LR_STAGED_OUTPUT_DIR) 2>&1
+	-mkdir -p $(LR_OUTPUT_DIR)
+	cp $(LR_STAGED_OUTPUT_DIR)/* $(LR_OUTPUT_DIR)
+	cat $(LR_OUTPUT_DIR)/*.csv
+	touch $(LR_OUTPUT)
+
+clean_LogisticRegression:
+	echo "Cleaning LogisticRegression generated files"
+	-rm -rf $(LR_STAGED_OUTPUT_DIR)
+	-rm -rf $(LR_OUTPUT_DIR)
+	-rm -rf $(LR_SENTINEL_DIR)
 
 include $(ENV)_hadoop_env
 export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
