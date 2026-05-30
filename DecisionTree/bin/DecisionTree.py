@@ -21,7 +21,7 @@ def main():
         print("Usage: DecisionTree.py <num_runs> <input_file> <output_dir>")
         sys.exit(-1)
 
-    num_runs = sys.argv[1]
+    num_runs = int(sys.argv[1])
     input_path = sys.argv[2]
     output_path = sys.argv[3]
 
@@ -82,8 +82,8 @@ def main():
     decision_tree = DecisionTreeClassifier(labelCol=LABEL_COLUMN, featuresCol=FEATURE_VECTOR_COLUMN)
     pipeline = Pipeline(stages = [label_indexer, feature_vector_assembler, decision_tree])
 
-    training_data = []
-    test_data = []
+    training_data = [None] * num_runs
+    test_data = [None] * num_runs
     # Split the data into training and test sets (30% held out for testing)
     # Make sure each split has a different, deterministic seed.
     for i in range(num_runs):
@@ -111,15 +111,24 @@ def main():
 
     accuracies = []
     for prediction in predictions:
-        accuracies.append = evaluator.evaluate(prediction)
+        accuracies.append(evaluator.evaluate(prediction))
 
-    accuracy_max = numpy.max(accuracies)
-    accuracy_min = numpy.min(accuracies)
-    accuracy_average = numpy.average(accuracies)
-    accuracy_stddev = numpy.std(accuracies)
+    # Python _sometimes_ has type safety. But only _sometimes_
+    accuracy_max = float(numpy.max(accuracies))
+    accuracy_min = float(numpy.min(accuracies))
+    accuracy_average = float(numpy.average(accuracies))
+    accuracy_stddev = float(numpy.std(accuracies))
 
-    data = [accuracy_max, accuracy_min, accuracy_average, accuracy_stddev]
-    output_dataframe = spark.createDataFrame(data, ["max", "min", "average", "stddev"])
+    data = [(accuracy_max, accuracy_min, accuracy_average, accuracy_stddev)]
+    out_schema = StructType([
+        StructField("max", DoubleType(), False),
+        StructField("min", DoubleType(), False),
+        StructField("average", DoubleType(), False),
+        StructField("stddev", DoubleType(), False)
+    ])
+    output_dataframe = spark.createDataFrame(data, schema=out_schema)
+
+    # output_dataframe = spark.createDataFrame(data, schema=["max", "min", "average", "stddev"])
     output_dataframe.coalesce(1).write.mode("errorifexists").option("header", "true").csv(output_path)
 
     spark.stop()

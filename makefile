@@ -1,7 +1,17 @@
-.PHONY: kinit_check env_check clean
 
+# Environment variable loading and exporting.
 ENV?=ecs
 
+include $(ENV)_hadoop_env
+export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
+
+include $(ENV)_spark_env
+export $(shell sed 's/=.*//' $(ENV)_spark_env)
+
+
+.PHONY: kinit_check env_check clean
+
+# Environment checks to ensure values are populated and working.
 env_check:
 	echo $(HADOOP_HOME)
 	echo $(PATH)
@@ -76,6 +86,9 @@ clean_$(SCRIPT_NAME): | $(SCRIPT_CHECK)
 	-hdfs dfs -rmdir "$(SCRIPT_OUTPUT_DIR)"
 	-hdfs dfs -rmdir "$(SCRIPT_NAME)"
 	-rm $(SCRIPT_SENTINELS)
+	-rm $(SCRIPT_OUTPUT_DIR)/*
+	-rm $(SCRIPT_OUTPUT_DIR)/.*
+	-rmdir $(SCRIPT_OUTPUT_DIR)
 	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/*
 	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/.*
 	-rmdir $(SCRIPT_STAGED_OUTPUT_DIR)
@@ -87,6 +100,7 @@ SCRIPT_STAGED_OUTPUT_DIR=$(SCRIPT_NAME)/staged_output
 local_$(SCRIPT_NAME):
 	echo "LOCAL - Submitting $(SCRIPT_EXEC)"
 	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/*
+	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/.*
 	-rmdir $(SCRIPT_STAGED_OUTPUT_DIR)
 	spark-submit --name $(SCRIPT_NAME) \
 	  --master "local[*]"  \
@@ -133,7 +147,102 @@ $(SCRIPT_OUTPUT): $(SRIPT_HDFS_SENTINEL) $(SCRIPT_PUSH_SENTINEL) $(SCRIPT_EXEC) 
 	hdfs dfs -get "$(SCRIPT_OUTPUT_DIR)/*" $(SCRIPT_OUTPUT_DIR)
 	touch $(SCRIPT_OUTPUT)
 
-include $(ENV)_hadoop_env
-export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
-include $(ENV)_spark_env
-export $(shell sed 's/=.*//' $(ENV)_spark_env)
+DT_NAME=DecisionTree
+DT_BIN_DIR=$(DT_NAME)/bin
+DT_INPUT_DIR=$(DT_NAME)/input
+DT_OUTPUT_DIR=$(DT_NAME)/output
+DT_SENTINEL_DIR=$(DT_NAME)/sentinel
+
+DT_EXEC=$(DT_BIN_DIR)/$(DT_NAME).py
+DT_INPUT=$(wildcard $(DT_INPUT_DIR)/*)
+DT_OUTPUT=$(DT_OUTPUT_DIR)/$(DT_NAME).output
+
+DT_HDFS_SENTINEL=$(DT_SENTINEL_DIR)/hdfs_path_created
+DT_PUSH_SENTINEL=$(DT_SENTINEL_DIR)/input_pushed
+DT_SENTINELS=$(DT_HDFS_SENTINEL) $(DT_PUSH_SENTINEL)
+DT_CHECK=$(DT_NAME)_check
+DT_NUM_RUNS=10
+
+$(DT_CHECK): | kinit_check hdfs_check spark_check
+
+clean_$(DT_NAME): | $(DT_CHECK)
+	-hdfs dfs -rm $(DT_INPUT)
+	-hdfs dfs -rm "$(DT_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(DT_INPUT_DIR)
+	-hdfs dfs -rmdir "$(DT_OUTPUT_DIR)"
+	-hdfs dfs -rmdir "$(DT_NAME)"
+	-rm $(DT_SENTINELS)
+	-rm $(DT_OUTPUT_DIR)/*
+	-rm $(DT_OUTPUT_DIR)/.*
+	-rmdir $(DT_OUTPUT_DIR)
+	-rm $(DT_STAGED_OUTPUT_DIR)/*
+	-rm $(DT_STAGED_OUTPUT_DIR)/.*
+	-rmdir $(DT_STAGED_OUTPUT_DIR)
+
+submit_$(DT_NAME): $(DT_OUTPUT)
+
+
+DT_STAGED_OUTPUT_DIR=$(DT_NAME)/staged_output
+local_$(DT_NAME):
+	echo "LOCAL - Submitting $(DT_EXEC)"
+	-rm $(DT_STAGED_OUTPUT_DIR)/*
+	-rm $(DT_STAGED_OUTPUT_DIR)/.*
+	-rmdir $(DT_STAGED_OUTPUT_DIR)
+	spark-submit --name $(DT_NAME) \
+	  --master "local[*]"  \
+	  $(DT_EXEC) \
+	  $(DT_NUM_RUNS) \
+	  $(DT_INPUT) \
+	  $(DT_STAGED_OUTPUT_DIR) 2>&1
+	-mkdir -p $(DT_OUTPUT_DIR)
+	cp $(DT_STAGED_OUTPUT_DIR)/* $(DT_OUTPUT_DIR)
+	cat $(DT_OUTPUT_DIR)/*.csv
+	touch $(DT_OUTPUT)
+
+
+$(DT_HDFS_SENTINEL): | $(DT_CHECK)
+	-hdfs dfs -rm $(DT_INPUT)
+	-hdfs dfs -rm "$(DT_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(DT_INPUT_DIR)
+	-mkdir -p $(DT_SENTINEL_DIR)
+	hdfs dfs -mkdir -p $(DT_INPUT_DIR)
+	touch $(DT_HDFS_SENTINEL)
+
+$(DT_PUSH_SENTINEL): $(DT_INPUT) $(DT_HDFS_SENTINEL) | $(DT_CHECK)
+	@echo "Pushing $?"
+	-for i in $(filter-out $(DT_SENTINEL_DIR)/%, $?) ; do \
+	  echo "Removing $$i"; \
+	  hdfs dfs -rm $$i; \
+	done
+	for i in $(filter-out $(DT_SENTINEL_DIR)/%, $?) ; do \
+	  echo "Pushing $$i"; \
+	  hdfs dfs -put $$i $$i; \
+	done;
+	touch $(DT_PUSH_SENTINEL)
+
+$(DT_OUTPUT): $(SRIPT_HDFS_SENTINEL) $(DT_PUSH_SENTINEL) $(DT_EXEC) | $(DT_CHECK)
+	echo "Submitting $(DT_EXEC)"
+	-hdfs dfs -rm "$(DT_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(DT_OUTPUT_DIR)
+	-mkdir -p $(DT_OUTPUT_DIR)
+	spark-submit --name $(DT_NAME) \
+	  --master yarn \
+	  --deploy-mode cluster \
+	  --conf spark.yarn.appMasterEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
+	  --conf spark.executorEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
+	  $(DT_EXEC) \
+	  $(DT_NUM_RUNS) \
+	  $(DT_INPUT) \
+	  $(DT_OUTPUT_DIR) 2>&1
+	-rm $(DT_OUTPUT_DIR)/*
+	hdfs dfs -get "$(DT_OUTPUT_DIR)/*" $(DT_OUTPUT_DIR)
+	cat $(DT_OUTPUT_DIR)/*.csv
+	touch $(DT_OUTPUT)
+
+
+
+
+
+
+
+
