@@ -1,11 +1,26 @@
+# Spark / Hadoop local runtime files
+spark-warehouse/
+.spark-warehouse/
+metastore_db/
+derby.log
+_SUCCESS
 
 # ignore output trees
 */output/
 */staged_output/
 */sentinel/
+*/results/
+
+# Python / virtual environment
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Ignore tempfiles.
 *~
+.DS_Store
 
-# .idea project files
-.idea
+# IDE project files
+.idea/
+.vscode/
