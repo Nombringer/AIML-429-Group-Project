@@ -88,6 +88,7 @@ $(SCRIPT_OUTPUT): $(SRIPT_HDFS_SENTINEL) $(SCRIPT_PUSH_SENTINEL) $(SCRIPT_EXEC) 
 	echo "Submitting $(SCRIPT_EXEC)"
 	-hdfs dfs -rm "$(SCRIPT_OUTPUT_DIR)/*"
 	-hdfs dfs -rmdir $(SCRIPT_OUTPUT_DIR)
+	-mkdir -p $(SCRIPT_OUTPUT_DIR)
 	spark-submit --name $(SCRIPT_NAME) \
 	  --master yarn \
 	  --deploy-mode cluster \
