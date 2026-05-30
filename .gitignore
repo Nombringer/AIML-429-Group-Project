@@ -2,6 +2,7 @@
 # ignore output trees
 */output/
 */staged_output/
+*/sentinel/
 
 # Ignore tempfiles.
 *~
