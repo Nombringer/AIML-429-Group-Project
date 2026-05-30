@@ -2,12 +2,6 @@
 # Environment variable loading and exporting.
 ENV?=ecs
 
-include $(ENV)_hadoop_env
-export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
-
-include $(ENV)_spark_env
-export $(shell sed 's/=.*//' $(ENV)_spark_env)
-
 
 .PHONY: kinit_check env_check clean
 
@@ -23,7 +17,7 @@ kinit_check:
 		echo "Skipping ECS only steps..."; \
 		exit 0; \
 	fi; \
-	@klist -s || (echo "No valid kerberos token, run kinit" && exit 1)
+	klist -s || (echo "No valid kerberos token, run kinit" && exit 1)
 
 hdfs_check:
 	@echo "Checking HDFS"
@@ -240,9 +234,9 @@ $(DT_OUTPUT): $(DT_HDFS_SENTINEL) $(DT_PUSH_SENTINEL) $(DT_EXEC) | $(DT_CHECK)
 	touch $(DT_OUTPUT)
 
 
+include $(ENV)_hadoop_env
+export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
 
-
-
-
-
+include $(ENV)_spark_env
+export $(shell sed 's/=.*//' $(ENV)_spark_env)
 
