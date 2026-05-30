@@ -1,5 +1,6 @@
 .PHONY: kinit_check env_check clean
 
+ENV?=ecs
 
 env_check:
 	echo $(HADOOP_HOME)
@@ -8,15 +9,27 @@ env_check:
 
 kinit_check:
 	@echo "Checking Kerberos"
+	@if [ "$(ENV)" != "ecs" ]; then \
+		echo "Skipping ECS only steps..."; \
+		exit 0; \
+	fi; \
 	@klist -s || (echo "No valid kerberos token, run kinit" && exit 1)
 
 hdfs_check:
 	@echo "Checking HDFS"
-	@hdfs dfs -ls / >/dev/null || (echo "Unable to connect to hdfs" && exit 1)
+	@if [ "$(ENV)" != "ecs" ]; then \
+		echo "Skipping ECS only steps..."; \
+		exit 0; \
+	fi; \
+	hdfs dfs -ls / >/dev/null || (echo "Unable to connect to hdfs" && exit 1)
 
 spark_check:
 	@echo "Checking Spark"
-	@echo 'val data = spark.range(1, 1000); data.count()' | spark-shell >/dev/null 2>&1 || (echo "Unable to connect to Spark" && exit 1)
+	@if [ "$(ENV)" != "ecs" ]; then \
+		echo "Skipping ECS only steps..."; \
+		exit 0; \
+	fi ; \
+	echo 'val data = spark.range(1, 1000); data.count()' | spark-shell >/dev/null 2>&1 || (echo "Unable to connect to Spark" && exit 1)
 
 # Each script has it's own tree.
 # ScriptName/input
@@ -36,6 +49,8 @@ spark_check:
 # To use:
 # make clean_SparkWordCount - clean out the HDFS tree and the local sentinels
 # make submit_SparkWordCount - prepare HDFS, submit the job and copy the output back
+#
+# make local_SparkWordCount ENV=local - run the script locally.
 
 SCRIPT_NAME=SparkWordCount
 SCRIPT_BIN_DIR=$(SCRIPT_NAME)/bin
@@ -61,8 +76,25 @@ clean_$(SCRIPT_NAME): | $(SCRIPT_CHECK)
 	-hdfs dfs -rmdir "$(SCRIPT_OUTPUT_DIR)"
 	-hdfs dfs -rmdir "$(SCRIPT_NAME)"
 	-rm $(SCRIPT_SENTINELS)
+	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/*
+	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/.*
+	-rmdir $(SCRIPT_STAGED_OUTPUT_DIR)
 
 submit_$(SCRIPT_NAME): $(SCRIPT_OUTPUT)
+
+
+SCRIPT_STAGED_OUTPUT_DIR=$(SCRIPT_NAME)/staged_output
+local_$(SCRIPT_NAME):
+	echo "LOCAL - Submitting $(SCRIPT_EXEC)"
+	-rm $(SCRIPT_STAGED_OUTPUT_DIR)/*
+	-rmdir $(SCRIPT_STAGED_OUTPUT_DIR)
+	spark-submit --name $(SCRIPT_NAME) \
+	  --master "local[*]"  \
+	  $(SCRIPT_EXEC) \
+	  $(SCRIPT_INPUT) \
+	  $(SCRIPT_STAGED_OUTPUT_DIR) 2>&1
+	cp $(SCRIPT_STAGED_OUTPUT_DIR)/* $(SCRIPT_OUTPUT_DIR)
+	touch $(SCRIPT_OUTPUT)
 
 $(SCRIPT_HDFS_SENTINEL): | $(SCRIPT_CHECK)
 	-hdfs dfs -rm $(SCRIPT_INPUT)
@@ -101,7 +133,7 @@ $(SCRIPT_OUTPUT): $(SRIPT_HDFS_SENTINEL) $(SCRIPT_PUSH_SENTINEL) $(SCRIPT_EXEC) 
 	hdfs dfs -get "$(SCRIPT_OUTPUT_DIR)/*" $(SCRIPT_OUTPUT_DIR)
 	touch $(SCRIPT_OUTPUT)
 
-include hadoop_env
-export $(shell sed 's/=.*//' hadoop_env)
-include spark_env
-export $(shell sed 's/=.*//' spark_env)
+include $(ENV)_hadoop_env
+export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
+include $(ENV)_spark_env
+export $(shell sed 's/=.*//' $(ENV)_spark_env)
