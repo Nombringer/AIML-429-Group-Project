@@ -1,0 +1,65 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,margin=0.85in]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\linespread{0.97}
+
+\title{DATA 427 Group Project: Spark ML on the KDD Dataset}
+\author{Insert ur names here}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Implement two programs that apply Spark’s Decision Tree algorithm and Logistic Regression algorithm to the provided KDD
+dataset. Run these programs 10 times on the school’s Hadoop cluster, each
+using a different seed to split the dataset into a training and a test set.}
+
+\subsection{Describe the two programs using pseudo-code}
+
+\subsubsection{Logistic Regression:}
+
+\begin{algorithm}
+\caption{Spark Logistic Regression}
+\begin{algorithmic}[1]
+
+\State Parse the input/output directories and number of runs
+\State Initialise the Spark session and load the data from the provided input directory
+
+\Statex
+\Statex \textbf{Setup the pipeline as follows}
+
+\State Index required columns
+\State One-hot encode required columns
+\State Assemble into feature columns
+\State Append parameterised logistic regression model as the final stage.
+
+   \For {Number of runs}
+      \State Set seed
+      \State The data into train/test
+      \State Fit the LR model on the train data
+      \State Evaluate the models performance on the training and testing split, and record results
+   \EndFor
+
+\State Display results
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+\end{document}

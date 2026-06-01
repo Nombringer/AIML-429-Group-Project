@@ -24,3 +24,22 @@ __pycache__/
 # IDE project files
 .idea/
 .vscode/
+
+
+# LaTeX build files
+report/*.aux
+report/*.bbl
+report/*.bcf
+report/*.blg
+report/*.fdb_latexmk
+report/*.fls
+report/*.log
+report/*.out
+report/*.run.xml
+report/*.synctex.gz
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.nav
+report/*.snm
+report/*.vrb
