@@ -58,8 +58,77 @@ using a different seed to split the dataset into a training and a test set.}
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Describe how to install and run the two programs step by
+step in a Readme.txt file.}
+
+Paste readme file here I guess? 
+
+\subsection{Report the training and test results including the max, min,
+average accuracy and the standard deviation obtained from the 10 runs,
+and the running time of each program.}
+
+\subsubsection{Technically these are local results, just putting here to get the format. (Also they will be pretty much the same on the cluster) Shoutout to generative ai for formatting my tables.}
+
+\begin{table}[h]
+\centering
+\caption{Summary of Spark logistic regression accuracy over 10 runs.}
+\begin{tabular}{lrrrr}
+\hline
+Metric & Average & Std. dev. & Min & Max \\
+\hline
+Training accuracy (\%) & 94.35 & 0.12 & 94.15 & 94.49 \\
+Test accuracy (\%) & 94.24 & 0.15 & 94.01 & 94.45 \\
+\hline
+\end{tabular}
+\end{table}
 
 
+\begin{table}[h]
+\centering
+\caption{Spark logistic regression results for each seeded run.}
+\begin{tabular}{rrrrrr}
+\hline
+Run & Seed & Train count & Test count & Train acc. (\%) & Test acc. (\%) \\
+\hline
+1 & 1 & 33506 & 14230 & 94.35 & 94.30 \\
+2 & 2 & 33450 & 14286 & 94.48 & 94.01 \\
+3 & 3 & 33508 & 14228 & 94.37 & 94.41 \\
+4 & 4 & 33466 & 14270 & 94.17 & 94.34 \\
+5 & 5 & 33376 & 14360 & 94.32 & 94.03 \\
+6 & 6 & 33581 & 14155 & 94.49 & 94.28 \\
+7 & 7 & 33458 & 14278 & 94.43 & 94.26 \\
+8 & 8 & 33561 & 14175 & 94.27 & 94.23 \\
+9 & 9 & 33435 & 14301 & 94.15 & 94.45 \\
+10 & 10 & 33353 & 14383 & 94.43 & 94.08 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Elapsed time for Spark logistic regression repeated executions.}
+\begin{tabular}{rrrr}
+\hline
+Run & Seed & Time 1 (s) & Time 2 (s) \\
+\hline
+1 & 1 & 28.27 & 24.30 \\
+2 & 2 & 20.88 & 14.84 \\
+3 & 3 & 26.32 & 20.60 \\
+4 & 4 & 24.55 & 19.67 \\
+5 & 5 & 19.59 & 17.59 \\
+6 & 6 & 23.29 & 23.23 \\
+7 & 7 & 23.93 & 16.30 \\
+8 & 8 & 18.39 & 15.94 \\
+9 & 9 & 22.99 & 21.39 \\
+10 & 10 & 23.36 & 18.07 \\
+\hline
+Average &  & 23.16 & 19.19 \\
+Std. dev. &  & 2.97 & 3.18 \\
+Min &  & 18.39 & 14.84 \\
+Max &  & 28.27 & 24.30 \\
+\hline
+\end{tabular}
+\end{table}
 
 
 \end{document}
