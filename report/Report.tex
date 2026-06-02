@@ -39,7 +39,7 @@ using a different seed to split the dataset into a training and a test set.}
 \State Initialise the Spark session and load the data from the provided input directory
 
 \Statex
-\Statex \textbf{Setup the pipeline as follows}
+\Statex \textbf{Setup the pipeline as follows:}
 
 \State Index required columns
 \State One-hot encode required columns
@@ -50,6 +50,30 @@ using a different seed to split the dataset into a training and a test set.}
       \State Set seed
       \State The data into train/test
       \State Fit the LR model on the train data
+      \State Evaluate the models performance on the training and testing split, and record results
+   \EndFor
+
+\State Display results
+
+\begin{algorithm}
+\caption{Spark Decision Tree}
+\begin{algorithmic}[1]
+
+\State Parse the input/output directories and number of runs
+\State Initialise the Spark session and load the data from the provided input directory
+
+\Statex Generate schema
+\Statex \textbf{Setup the pipeline as follows:}
+
+\State Index required columns
+\State One-hot encode required columns
+\State Assemble into feature columns
+\State Append parameterised logistic regression model as the final stage.
+
+   \For {Number of runs}
+      \State Set seed
+      \State The data into train/test
+      \State Fit the Decision Tree odel on the train data
       \State Evaluate the models performance on the training and testing split, and record results
    \EndFor
 
