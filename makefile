@@ -3,7 +3,15 @@
 ENV?=ecs
 
 
-.PHONY: kinit_check env_check clean
+.PHONY: kinit_check env_check clean release
+
+
+PDF_TARGETS=$(wildcard *.pdf)
+RELEASE_NAME=group_22_aiml427_asst3
+OTHER_FILES=makefile README.txt to_schema.sh ecs_hadoop_env ecs_spark_env local_hadoop_env local_spark_env $(SCRIPT_NAME) $(DT_NAME) LogisticRegression
+
+release: clean_$(SCRIPT_NAME) clean_$(DT_NAME) clean_$(LR_NAME)
+	tar -czf $(RELEASE_NAME).tgz -s ",^,$(RELEASE_NAME)/," $(PDF_TARGETS) $(OTHER_FILES)
 
 # Environment checks to ensure values are populated and working.
 env_check:
@@ -270,7 +278,7 @@ local_$(LR_NAME):
 	cat $(LR_OUTPUT_DIR)/*.csv
 	touch $(LR_OUTPUT)
 
-clean_LogisticRegression:
+clean_$(LR_NAME):
 	echo "Cleaning LogisticRegression generated files"
 	-rm -rf $(LR_STAGED_OUTPUT_DIR)
 	-rm -rf $(LR_OUTPUT_DIR)
