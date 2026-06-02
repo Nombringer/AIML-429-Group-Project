@@ -3,15 +3,19 @@
 ENV?=ecs
 
 
-.PHONY: kinit_check env_check clean release
+.PHONY: kinit_check env_check clean release all
 
 
 PDF_TARGETS=$(wildcard *.pdf)
 RELEASE_NAME=group_22_aiml427_asst3
 OTHER_FILES=makefile README.txt to_schema.sh ecs_hadoop_env ecs_spark_env local_hadoop_env local_spark_env $(SCRIPT_NAME) $(DT_NAME) LogisticRegression
 
-release: clean_$(SCRIPT_NAME) clean_$(DT_NAME) clean_$(LR_NAME)
+release: clean
 	tar -czf $(RELEASE_NAME).tgz -s ",^,$(RELEASE_NAME)/," $(PDF_TARGETS) $(OTHER_FILES)
+
+all: submit_DecisionTree submit_SparkWordCount submit_LogisticRegression
+
+clean: clean_$(SCRIPT_NAME) clean_$(DT_NAME) clean_$(LR_NAME)
 
 # Environment checks to ensure values are populated and working.
 env_check:
