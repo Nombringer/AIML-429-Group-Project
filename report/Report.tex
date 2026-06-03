@@ -74,15 +74,18 @@ using a different seed to split the dataset into a training and a test set.}
 \State Index required columns
 \State One-hot encode required columns
 \State Assemble into feature columns
-\State Append parameterised logistic regression model as the final stage.
-
-   \For {Number of runs}
-      \State Set seed
-      \State The data into train/test
-      \State Fit the Decision Tree odel on the train data
-      \State Evaluate the models performance on the training and testing split, and record results
-   \EndFor
-
+\State Append parameterised DecitionTree model as the final stage.
+\Statex \textbf{Run the pipeline:}
+\State Split the test/training data into num\_runs instances
+\State Foreach training data, train a model
+\Statex \textbf{Evaluate the results:}
+\State Output the DecisionTree structure for the first tree
+\State Foreach (model, training data) pair, generate predictions
+\State Foreach (model, testing data) pair, generate predictions
+\State Foreach training prediction, generate an accuracy row
+\State Foreach test prediction, generate an accuracy row
+\State Produce a CSV with the aggregate data by test/train
+\State Produce a CSV with the per-run data
 \State Display results
 
 \end{algorithmic}
