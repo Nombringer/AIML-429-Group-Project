@@ -13,9 +13,6 @@ OTHER_FILES=makefile README.txt to_schema.sh ecs_hadoop_env ecs_spark_env local_
 release: clean
 	tar -czf $(RELEASE_NAME).tgz -s ",^,$(RELEASE_NAME)/," $(PDF_TARGETS) $(OTHER_FILES)
 
-all: submit_DecisionTree submit_SparkWordCount submit_LogisticRegression
-
-clean: clean_$(SCRIPT_NAME) clean_$(DT_NAME) clean_$(LR_NAME)
 
 # Environment checks to ensure values are populated and working.
 env_check:
@@ -340,6 +337,9 @@ clean_$(LR_NAME):
 	-rm -rf $(LR_SENTINEL_DIR)
 
 
+all: submit_$(SCRIPT_NAME) submit_$(DT_NAME) submit_$(LR_NAME)
+
+clean: clean_$(SCRIPT_NAME) clean_$(DT_NAME) clean_$(LR_NAME)
 
 include $(ENV)_hadoop_env
 export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
