@@ -6,12 +6,14 @@ ENV?=ecs
 .PHONY: kinit_check env_check clean release all
 
 
-PDF_TARGETS=$(wildcard *.pdf)
+PDF_TARGETS=Report.pdf
 RELEASE_NAME=group_22_aiml427_asst3
 OTHER_FILES=makefile README.txt to_schema.sh ecs_hadoop_env ecs_spark_env local_hadoop_env local_spark_env $(SCRIPT_NAME) $(DT_NAME) LogisticRegression
 
 release: clean
+	cp report/Report.pdf Report.pdf
 	tar -czf $(RELEASE_NAME).tgz -s ",^,$(RELEASE_NAME)/," $(PDF_TARGETS) $(OTHER_FILES)
+	-rm Report.pdf
 
 
 # Environment checks to ensure values are populated and working.
