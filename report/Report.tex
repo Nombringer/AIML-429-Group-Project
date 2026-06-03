@@ -10,13 +10,14 @@
 \usepackage{float}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{placeins}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.45em}
 \linespread{0.97}
 
 \title{DATA 427 Group Project: Spark ML on the KDD Dataset}
-\author{Insert ur names here}
+\author{Jason Pollock, Fabian Day, Bex Campbell-Redl}
 \date{}
 
 \begin{document}
@@ -58,6 +59,8 @@ using a different seed to split the dataset into a training and a test set.}
 \end{algorithmic}
 \end{algorithm}
 
+\subsubsection{Decision Tree}
+
 \begin{algorithm}
 \caption{Spark Decision Tree}
 \begin{algorithmic}[1]
@@ -85,10 +88,100 @@ using a different seed to split the dataset into a training and a test set.}
 \end{algorithmic}
 \end{algorithm}
 
+\FloatBarrier
+
 \subsection{Describe how to install and run the two programs step by
 step in a Readme.txt file.}
 
-Paste readme file here I guess? 
+\textbf{* README}
+
+group: 22
+
+authors: Bex Campbell-Redl, Fabian Day, Jason Pollock
+
+email: \texttt{campberebe3@myvuw.ac.nz}, \texttt{dayfabi@myvuw.ac.nz}, \texttt{pollocjaso@myvuw.ac.nz}
+
+\textbf{* Setup Notes}
+
+\begin{itemize}
+    \item Ensure that you have a user directory on the HDFS cluster
+    \item Download the Tarball into a folder on your ECS desktop
+    \item Extract the tarball
+    \item cd into the extracted folder
+\end{itemize}
+
+\textbf{* How to install}
+
+If you are reading this, it is installed.
+
+\textbf{* Directory Layout}
+
+\begin{itemize}
+    \item \texttt{SparkWordCount/input} - the dataset extracted and ready for use
+    \item \texttt{SparkWordCount/bin} - where the code is placed
+    \item \texttt{SparkWordCount/staged\_output} - where local runs place their output instead of HDFS
+
+    \item \texttt{DecisionTree/input} - the dataset extracted and ready for use
+    \item \texttt{DecisionTree/bin} - where the code is placed
+    \item \texttt{DecisionTree/staged\_output} - where local runs place their output instead of HDFS
+
+    \item \texttt{LogisticRegression/input} - the dataset extracted and ready for use
+    \item \texttt{LogisticRegression/bin} - where the code is placed
+    \item \texttt{LogisticRegression/staged\_output} - where local runs place their output instead of HDFS
+
+    \item \texttt{ecs\_hadoop\_env} - the ECS cluster Hadoop makefile variables
+    \item \texttt{ecs\_spart\_env} - the ECS cluster Spark makefile variables
+    \item \texttt{local\_hadoop\_env} - the Hadoop makefile variables for local execution
+    \item \texttt{local\_spark\_env} - the Hadoop makefile variables for local execution
+\end{itemize}
+
+\textbf{* How to run}
+
+The makefile supports two execution modes, ecs and local, picked via a ENV environment variable. "ecs" is the default.
+
+The makefile will ensure proper configured access to kerberos, HDFS and Spark before attempting to launch the job.
+
+This is configured to run via makefile. To run a variant:
+
+\begin{verbatim}
+$ make submit_DecisionTree
+$ make submit_SparkWordCount
+$ make submit_LogisticRegression
+\end{verbatim}
+
+or optionally
+
+\begin{verbatim}
+$ make all
+\end{verbatim}
+
+The output will be placed in:
+
+\begin{verbatim}
+DecisionTree/output
+LogisticRegression/output
+SparkWordCount/output
+\end{verbatim}
+
+\begin{verbatim}
+$ cat DecisionTree/output/*.csv
+$ cat LogisticRegression/output/*.csv
+$ cat SparkWordCount/output/*.csv
+\end{verbatim}
+
+To clean the files when complete:
+
+\begin{verbatim}
+$ make clean_DecisionTree
+$ make clean_LogisticRegression
+$ make clean_SparkWordCount
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+$ make clean
+\end{verbatim}
 
 \subsection{Report the training and test results including the max, min,
 average accuracy and the standard deviation obtained from the 10 runs,
