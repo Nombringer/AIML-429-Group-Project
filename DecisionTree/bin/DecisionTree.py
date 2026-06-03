@@ -95,6 +95,10 @@ def main():
         trained_models.append(pipeline.fit(train))
 
     # Predict the results of the 10 trees.
+    train_predictions = []
+    for (model, train) in zip(trained_models, training_data):
+        train_predictions.append(model.transform(train))
+
     predictions = []
     for (model, test) in zip(trained_models, test_data):
         predictions.append(model.transform(test))
@@ -108,19 +112,29 @@ def main():
     evaluator = MulticlassClassificationEvaluator(labelCol=LABEL_COLUMN,
                                                   predictionCol=PREDICTION_COLUMN,
                                                   metricName="accuracy")
-
-    accuracies = []
-    for prediction in predictions:
-        accuracies.append(evaluator.evaluate(prediction))
-
+    train_accuracies = []
+    for prediction in train_predictions:
+        train_accuracies.append(evaluator.evaluate(prediction))
     # Python _sometimes_ has type safety. But only _sometimes_
-    accuracy_max = float(numpy.max(accuracies))
-    accuracy_min = float(numpy.min(accuracies))
-    accuracy_average = float(numpy.average(accuracies))
-    accuracy_stddev = float(numpy.std(accuracies))
+    train_accuracy_max = float(numpy.max(train_accuracies))
+    train_accuracy_min = float(numpy.min(train_accuracies))
+    train_accuracy_average = float(numpy.average(train_accuracies))
+    train_accuracy_stddev = float(numpy.std(train_accuracies))
 
-    data = [(accuracy_max, accuracy_min, accuracy_average, accuracy_stddev)]
+    test_accuracies = []
+    for prediction in predictions:
+        test_accuracies.append(evaluator.evaluate(prediction))
+    accuracy_max = float(numpy.max(test_accuracies))
+    accuracy_min = float(numpy.min(test_accuracies))
+    accuracy_average = float(numpy.average(test_accuracies))
+    accuracy_stddev = float(numpy.std(test_accuracies))
+
+    data = [
+        ("train", train_accuracy_max, train_accuracy_min, train_accuracy_average, train_accuracy_stddev),
+        ("test", accuracy_max, accuracy_min, accuracy_average, accuracy_stddev)
+    ]
     out_schema = StructType([
+        StructField("name", StringType(), False),
         StructField("max", DoubleType(), False),
         StructField("min", DoubleType(), False),
         StructField("average", DoubleType(), False),
@@ -130,6 +144,23 @@ def main():
 
     # output_dataframe = spark.createDataFrame(data, schema=["max", "min", "average", "stddev"])
     output_dataframe.coalesce(1).write.mode("errorifexists").option("header", "true").csv(output_path)
+
+    result_rows = []
+    run = 0
+    for (train, test, train_accuracy, test_accuracy ) in zip(training_data, test_data, train_accuracies, test_accuracies) :
+        result_rows.append( (run + 1, RANDOM_SEED + run, train.count(), test.count(), train_accuracy, test_accuracy))
+        run += 1
+
+    result_schema = StructType([
+        StructField("run", LongType(), False),
+        StructField("seed", LongType(), False),
+        StructField("train_count", LongType(), False),
+        StructField("test_count", LongType(), False),
+        StructField("train_accuracy", DoubleType(), False),
+        StructField("test_accuracy", DoubleType(), False),
+    ])
+    results_df = spark.createDataFrame(result_rows, schema=result_schema)
+    results_df.coalesce(1).write.mode("append").option("header", "true").csv(output_path)
 
     spark.stop()
 
