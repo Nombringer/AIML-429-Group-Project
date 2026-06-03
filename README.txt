@@ -10,12 +10,14 @@ Important note on Makefile:
 This project uses a makefile. A makefile is the most efficient way to ensure all required setup, admin and installation tasks have been successfully executed before attempting to run code. This is particularly important when working in a group to ensure everyone has the same setup when running or writing code. The makefile for this includes hadoop setup, java8, kinit and sparkclasspath setup. Please read the makefile for further information.
 
 Part 1: Setup & Environment
+
 1. Ensure that you have a user directory on the HDFS cluster (if you do not have one, create one)
 2. Download the submitted Tarball into a folder on your ECS desktop
 3. Extract the tarball (alternatively you can clone our git repo)
 4. cd into the extracted folder
 
 Part 2: Understanding the Directory Layout
+
 Directories:
 
 SparkWordCount/input - the dataset extracted and ready for use
@@ -37,8 +39,6 @@ Part 3: How to run the code
 
 The makefile supports two execution modes, ecs and local, picked via a ENV environment variable. "ecs" is the default.
 The makefile will ensure proper configured access to kerberos, HDFS and Spark before attempting to launch the job.
-
-This is configured to run via makefile. To run a variant: 
 
 Part 3a: Decision Tree
 
