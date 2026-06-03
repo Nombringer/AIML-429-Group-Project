@@ -4,6 +4,13 @@ group: 22
 authors: Bex Campbell-Redl, Fabian Day, Jason Pollock
 email: campberebe3@myvuw.ac.nz, dayfabi@myvuw.ac.nz, pollocjaso@myvuw.ac.nz
 
+* Setup Notes
+
+- Ensure that you have a user directory on the HDFS cluster
+- Download the Tarball into a folder on your ECS desktop
+- Extract the tarball
+- cd into the extracted folder
+
 * How to install
 
 If you are reading this, it is installed.
