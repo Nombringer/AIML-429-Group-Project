@@ -253,33 +253,84 @@ LR_BIN_DIR=$(LR_NAME)/bin
 LR_INPUT_DIR=$(LR_NAME)/input
 LR_OUTPUT_DIR=$(LR_NAME)/output
 LR_SENTINEL_DIR=$(LR_NAME)/sentinel
+
 LR_EXEC=$(LR_BIN_DIR)/$(LR_NAME).py
 LR_INPUT=$(wildcard $(LR_INPUT_DIR)/*)
 LR_OUTPUT=$(LR_OUTPUT_DIR)/$(LR_NAME).output
+
 LR_HDFS_SENTINEL=$(LR_SENTINEL_DIR)/hdfs_path_created
 LR_PUSH_SENTINEL=$(LR_SENTINEL_DIR)/input_pushed
 LR_SENTINELS=$(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL)
 LR_CHECK=$(LR_NAME)_check
-LR_NUM_RUNS=10
 
 $(LR_CHECK): | kinit_check hdfs_check spark_check
 
-LR_STAGED_OUTPUT_DIR=$(LR_NAME)/staged_output
+clean_$(LR_NAME): | $(LR_CHECK)
+	-hdfs dfs -rm $(LR_INPUT)
+	-hdfs dfs -rm "$(LR_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(LR_INPUT_DIR)
+	-hdfs dfs -rmdir "$(LR_OUTPUT_DIR)"
+	-hdfs dfs -rmdir "$(LR_NAME)"
+	-rm $(LR_SENTINELS)
+	-rm $(LR_OUTPUT_DIR)/*
+	-rm $(LR_OUTPUT_DIR)/.*
+	-rmdir $(LR_OUTPUT_DIR)
+	-rm $(LR_STAGED_OUTPUT_DIR)/*
+	-rm $(LR_STAGED_OUTPUT_DIR)/.*
+	-rmdir $(LR_STAGED_OUTPUT_DIR)
 
+submit_$(LR_NAME): $(LR_OUTPUT)
+
+
+LR_STAGED_OUTPUT_DIR=$(LR_NAME)/staged_output
 local_$(LR_NAME):
 	echo "LOCAL - Submitting $(LR_EXEC)"
 	-rm $(LR_STAGED_OUTPUT_DIR)/*
 	-rm $(LR_STAGED_OUTPUT_DIR)/.*
 	-rmdir $(LR_STAGED_OUTPUT_DIR)
 	spark-submit --name $(LR_NAME) \
-		  --master "local[*]"  \
-		  $(LR_EXEC) \
-		  $(LR_NUM_RUNS) \
-		  $(LR_INPUT) \
-		  $(LR_STAGED_OUTPUT_DIR) 2>&1
-	-mkdir -p $(LR_OUTPUT_DIR)
+	  --master "local[*]"  \
+	  $(LR_EXEC) \
+	  $(LR_INPUT) \
+	  $(LR_STAGED_OUTPUT_DIR) 2>&1
 	cp $(LR_STAGED_OUTPUT_DIR)/* $(LR_OUTPUT_DIR)
-	cat $(LR_OUTPUT_DIR)/*.csv
+	touch $(LR_OUTPUT)
+
+$(LR_HDFS_SENTINEL): | $(LR_CHECK)
+	-hdfs dfs -rm $(LR_INPUT)
+	-hdfs dfs -rm "$(LR_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(LR_INPUT_DIR)
+	-mkdir -p $(LR_SENTINEL_DIR)
+	hdfs dfs -mkdir -p $(LR_INPUT_DIR)
+	touch $(LR_HDFS_SENTINEL)
+
+$(LR_PUSH_SENTINEL): $(LR_INPUT) $(LR_HDFS_SENTINEL) | $(LR_CHECK)
+	@echo "Pushing $?"
+	-for i in $(filter-out $(LR_SENTINEL_DIR)/%, $?) ; do \
+	  echo "Removing $$i"; \
+	  hdfs dfs -rm $$i; \
+	done
+	for i in $(filter-out $(LR_SENTINEL_DIR)/%, $?) ; do \
+	  echo "Pushing $$i"; \
+	  hdfs dfs -put $$i $$i; \
+	done;
+	touch $(LR_PUSH_SENTINEL)
+
+$(LR_OUTPUT): $(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL) $(LR_EXEC) | $(LR_CHECK)
+	echo "Submitting $(LR_EXEC)"
+	-hdfs dfs -rm "$(LR_OUTPUT_DIR)/*"
+	-hdfs dfs -rmdir $(LR_OUTPUT_DIR)
+	-mkdir -p $(LR_OUTPUT_DIR)
+	spark-submit --name $(LR_NAME) \
+	  --master yarn \
+	  --deploy-mode cluster \
+	  --conf spark.yarn.appMasterEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
+	  --conf spark.executorEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
+	  $(LR_EXEC) \
+	  $(LR_INPUT) \
+	  $(LR_OUTPUT_DIR) 2>&1
+	-rm $(LR_OUTPUT_DIR)/*
+	hdfs dfs -get "$(LR_OUTPUT_DIR)/*" $(LR_OUTPUT_DIR)
 	touch $(LR_OUTPUT)
 
 clean_$(LR_NAME):
@@ -287,6 +338,8 @@ clean_$(LR_NAME):
 	-rm -rf $(LR_STAGED_OUTPUT_DIR)
 	-rm -rf $(LR_OUTPUT_DIR)
 	-rm -rf $(LR_SENTINEL_DIR)
+
+
 
 include $(ENV)_hadoop_env
 export $(shell sed 's/=.*//' $(ENV)_hadoop_env)
