@@ -10,6 +10,8 @@ email: campberebe3@myvuw.ac.nz, dayfabi@myvuw.ac.nz, pollocjaso@myvuw.ac.nz
 - Extract the tarball
 - cd into the extracted folder
 
+This project uses a makefile. A makefile is the most efficient way to ensure all required setup, admin and installation tasks have been successfully executed before attempting to run code. The makefile for this includes hadoop setup, java8, kinit and sparkclasspath setup.
+
 * How to install
 
 If you are reading this, it is installed.
