@@ -257,6 +257,7 @@ LR_SENTINEL_DIR=$(LR_NAME)/sentinel
 LR_EXEC=$(LR_BIN_DIR)/$(LR_NAME).py
 LR_INPUT=$(wildcard $(LR_INPUT_DIR)/*)
 LR_OUTPUT=$(LR_OUTPUT_DIR)/$(LR_NAME).output
+LR_NUM_RUNS=10
 
 LR_HDFS_SENTINEL=$(LR_SENTINEL_DIR)/hdfs_path_created
 LR_PUSH_SENTINEL=$(LR_SENTINEL_DIR)/input_pushed
@@ -327,6 +328,7 @@ $(LR_OUTPUT): $(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL) $(LR_EXEC) | $(LR_CHECK)
 	  --conf spark.yarn.appMasterEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
 	  --conf spark.executorEnv.JAVA_HOME=/usr/lib/jvm/java-21-openjdk \
 	  $(LR_EXEC) \
+	  $(LR_NUM_RUNS) \
 	  $(LR_INPUT) \
 	  $(LR_OUTPUT_DIR) 2>&1
 	-rm $(LR_OUTPUT_DIR)/*
