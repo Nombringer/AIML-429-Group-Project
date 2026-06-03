@@ -106,6 +106,8 @@ def main():
     # Print some output, just because.
     predictions[0].select(LABEL_COLUMN, PREDICTION_COLUMN).show(5)
 
+    print(f"DecisionTree Structure:\n{trained_models[0].stages[-1].toDebugString}")
+
     # Report the 10 results.
     # remove max(Accuracy), min(accuracy), average(accuracy) std_dev(accuracy)
     # Get the accuracies.
