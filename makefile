@@ -337,6 +337,7 @@ $(LR_OUTPUT): $(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL) $(LR_EXEC) | $(LR_CHECK)
 	  $(LR_OUTPUT_DIR) 2>&1
 	-rm $(LR_OUTPUT_DIR)/*
 	hdfs dfs -get "$(LR_OUTPUT_DIR)/*" $(LR_OUTPUT_DIR)
+	cat $(LR_OUTPUT_DIR)/*.csv
 	touch $(LR_OUTPUT)
 
 
