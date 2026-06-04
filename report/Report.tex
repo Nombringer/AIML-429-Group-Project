@@ -150,89 +150,93 @@ This is configured to run via makefile. To run a variant:
 
 \textbf{Part 3a: Decision Tree}
 
-\begin{verbatim}
-$ make submit_DecisionTree
-\end{verbatim}
+\begin{itemize}
+    \item Run the Decision Tree program:
+    \begin{itemize}
+        \item \texttt{\$ make submit\_DecisionTree}
+    \end{itemize}
 
-The output will be placed in:
+    \item The output will be placed in:
+    \begin{itemize}
+        \item \texttt{DecisionTree/output}
+    \end{itemize}
 
-\begin{verbatim}
-DecisionTree/output
-\end{verbatim}
+    \item View the output:
+    \begin{itemize}
+        \item \texttt{\$ cat DecisionTree/output/*.csv}
+    \end{itemize}
 
-\begin{verbatim}
-$ cat DecisionTree/output/*.csv
-\end{verbatim}
-
-To clean the files when complete:
-
-\begin{verbatim}
-$ make clean_DecisionTree
-\end{verbatim}
+    \item To clean the files when complete:
+    \begin{itemize}
+        \item \texttt{\$ make clean\_DecisionTree}
+    \end{itemize}
+\end{itemize}
 
 \textbf{Part 3b: Logistic Regression}
 
-\begin{verbatim}
-$ make submit_LogisticRegression
-\end{verbatim}
+\begin{itemize}
+    \item Run the Logistic Regression program:
+    \begin{itemize}
+        \item \texttt{\$ make submit\_LogisticRegression}
+    \end{itemize}
 
-The output will be placed in:
+    \item The output will be placed in:
+    \begin{itemize}
+        \item \texttt{LogisticRegression/output}
+    \end{itemize}
 
-\begin{verbatim}
-LogisticRegression/output
-\end{verbatim}
+    \item View the output:
+    \begin{itemize}
+        \item \texttt{cat LogisticRegression/output/*.csv}
+    \end{itemize}
 
-\begin{verbatim}
-cat LogisticRegression/output/*.csv
-\end{verbatim}
-
-To clean the files when complete:
-
-\begin{verbatim}
-$ make clean_LogisticRegression
-\end{verbatim}
+    \item To clean the files when complete:
+    \begin{itemize}
+        \item \texttt{\$ make clean\_LogisticRegression}
+    \end{itemize}
+\end{itemize}
 
 \textbf{Optional Variant modes:}
 
 Runs spark wordcount
 
-\begin{verbatim}
-$ make submit_SparkWordCount
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{\$ make submit\_SparkWordCount}
+\end{itemize}
 
 To Run all modes
 
-\begin{verbatim}
-$ make all
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{\$ make all}
+\end{itemize}
 
 The output(s) will be placed in:
 
-\begin{verbatim}
-DecisionTree/output
-LogisticRegression/output
-SparkWordCount/output
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{DecisionTree/output}
+    \item \texttt{LogisticRegression/output}
+    \item \texttt{SparkWordCount/output}
+\end{itemize}
 
-\begin{verbatim}
-$ cat DecisionTree/output/*.csv
-$ cat LogisticRegression/output/*.csv
-$ cat SparkWordCount/output/*.csv
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{\$ cat DecisionTree/output/*.csv}
+    \item \texttt{\$ cat LogisticRegression/output/*.csv}
+    \item \texttt{\$ cat SparkWordCount/output/*.csv}
+\end{itemize}
 
 To clean the files when complete:
 
-\begin{verbatim}
-$ make clean_DecisionTree
-$ make clean_LogisticRegression
-$ make clean_SparkWordCount
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{\$ make clean\_DecisionTree}
+    \item \texttt{\$ make clean\_LogisticRegression}
+    \item \texttt{\$ make clean\_SparkWordCount}
+\end{itemize}
 
 or
 
-\begin{verbatim}
-$ make clean
-\end{verbatim}
+\begin{itemize}
+    \item \texttt{\$ make clean}
+\end{itemize}
 
 \subsection{Report the training and test results including the max, min,
 average accuracy and the standard deviation obtained from the 10 runs,
@@ -240,7 +244,54 @@ and the running time of each program.}
 
 \subsubsection{Decision Tree:}
 
-\begin{table}[h]
+
+\begin{table}[H]
+\centering
+\caption{Summary of decision tree accuracy over 10 runs.}
+\begin{tabular}{lrrrr}
+\hline
+Metric & Average & Std. dev. & Min & Max \\
+\hline
+Training accuracy (\%) & 94.62 & 0.15 & 94.39 & 94.94 \\
+Test accuracy (\%)     & 94.57 & 0.21 & 94.37 & 95.06 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Logistic Regression:}
+
+
+\begin{table}[H]
+\centering
+\caption{Summary of logistic regression accuracy over 10 runs.}
+\begin{tabular}{lrrrr}
+\hline
+Metric & Average & Std. dev. & Min & Max \\
+\hline
+Training accuracy (\%) & 94.35 & 0.11 & 94.21 & 94.50 \\
+Test accuracy (\%)     & 94.15 & 0.17 & 93.93 & 94.37 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Summary of model test accuracy and total running time over 10 runs.}
+\begin{tabular}{lrrrrr}
+\hline
+Program & Average acc. (\%) & Std. dev. & Min acc. (\%) & Max acc. (\%) & Total time (s) \\
+\hline
+Decision Tree              & 94.57 & 0.21 & 94.37 & 95.06 & 65.37 \\
+Spark Logistic Regression  & 94.15 & 0.17 & 93.93 & 94.37 & 129.29 \\
+\hline
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Appendix:}
+
+\begin{table}[H]
 \centering
 \caption{Decision tree results for each seeded run.}
 \begin{tabular}{rrrrrr}
@@ -261,22 +312,7 @@ Run & Seed & Train count & Test count & Train acc. (\%) & Test acc. (\%) \\
 \end{tabular}
 \end{table}
 
-\begin{table}[h]
-\centering
-\caption{Summary of decision tree accuracy over 10 runs.}
-\begin{tabular}{lrrrr}
-\hline
-Metric & Average & Std. dev. & Min & Max \\
-\hline
-Training accuracy (\%) & 94.62 & 0.14 & 94.39 & 94.94 \\
-Test accuracy (\%)     & 94.57 & 0.20 & 94.37 & 95.06 \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Logistic Regression:}
-
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \caption{Logistic regression results for each seeded run.}
 \begin{tabular}{rrrrrrr}
@@ -296,40 +332,6 @@ Run & Seed & Train count & Test count & Train acc. (\%) & Test acc. (\%) & Time 
 \hline
 \end{tabular}
 \end{table}
-
-\begin{table}[h]
-\centering
-\caption{Summary of logistic regression accuracy over 10 runs.}
-\begin{tabular}{lrrrr}
-\hline
-Metric & Average & Std. dev. & Min & Max \\
-\hline
-Training accuracy (\%) & 94.35 & 0.11 & 94.21 & 94.50 \\
-Test accuracy (\%)     & 94.15 & 0.17 & 93.93 & 94.37 \\
-Elapsed time (s)       & 7.13  & 1.14 & 6.37  & 10.09 \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Comparison:}
-
-\begin{table}[h]
-\centering
-\caption{Summary of model test accuracy and total running time over 10 runs.}
-\begin{tabular}{lrrrrr}
-\hline
-Program & Average acc. (\%) & Std. dev. & Min acc. (\%) & Max acc. (\%) & Total time (s) \\
-\hline
-Decision Tree              & 94.57 & 0.20 & 94.37 & 95.06 & 65.37 \\
-Spark Logistic Regression  & 94.15 & 0.17 & 93.93 & 94.37 & 129.29 \\
-\hline
-\end{tabular}
-\end{table}
-
-
-\FloatBarrier
-
-\subsection{Appendix:}
 
 \subsubsection{Example of trained decision tree structure from a run}
 
