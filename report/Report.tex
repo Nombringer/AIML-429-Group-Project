@@ -95,156 +95,15 @@ using a different seed to split the dataset into a training and a test set.}
 \subsection{Describe how to install and run the two programs step by
 step in a Readme.txt file.}
 
-\textbf{* README}
-
-group: 22
-
-authors: Bex Campbell-Redl, Fabian Day, Jason Pollock
-
-email: \texttt{campberebe3@myvuw.ac.nz}, \texttt{dayfabi@myvuw.ac.nz}, \texttt{pollocjaso@myvuw.ac.nz}
-
-How to Install and Run Group22's Decision Tree and Logistic Regression code on the Hadoop cluster
-
-Important note on Makefile:
-This project uses a makefile. A makefile is the most efficient way to ensure all required setup, admin and installation tasks have been successfully executed before attempting to run code. This is particularly important when working in a group to ensure everyone has the same setup when running or writing code. The makefile for this includes hadoop setup, java8, kinit and sparkclasspath setup. Please read the makefile for further information.
-
-\textbf{Part 1: Setup \& Environment}
-
-\begin{enumerate}
-    \item Ensure that you have an ECS user account and can either access the lab or SSH in via username@entry.ecs.vuw.ac.nz and then into a cluster machine
-    \item Ensure that you have a user directory on the HDFS cluster (if you do not have one, create one)
-    \item Download the submitted Tarball into a folder on your ECS desktop
-    \item Extract the tarball (alternatively you can clone our git repo)
-    \item cd into the extracted folder
-\end{enumerate}
-
-\textbf{Part 2: Understanding the Directory Layout}
-
-Directories:
-
-\begin{itemize}
-    \item \texttt{SparkWordCount/input} - the dataset extracted and ready for use
-    \item \texttt{SparkWordCount/bin} - where the code is placed
-    \item \texttt{SparkWordCount/staged\_output} - where local runs place their output instead of HDFS
-
-    \item \texttt{DecisionTree/input} - the dataset extracted and ready for use
-    \item \texttt{DecisionTree/bin} - where the code is placed
-    \item \texttt{DecisionTree/staged\_output} - where local runs place their output instead of HDFS
-
-    \item \texttt{LogisticRegression/input} - the dataset extracted and ready for use
-    \item \texttt{LogisticRegression/bin} - where the code is placed
-    \item \texttt{LogisticRegression/staged\_output} - where local runs place their output instead of HDFS
-
-    \item \texttt{ecs\_hadoop\_env} - the ECS cluster Hadoop makefile variables
-    \item \texttt{ecs\_spark\_env} - the ECS cluster Spark makefile variables
-    \item \texttt{local\_hadoop\_env} - the Hadoop makefile variables for local execution
-    \item \texttt{local\_spark\_env} - the Spark makefile variables for local execution
-\end{itemize}
-
-\textbf{Part 3: How to run the code}
-
-The makefile supports two execution modes, ecs and local, picked via a ENV environment variable. "ecs" is the default.
-
-The makefile will ensure proper configured access to kerberos, HDFS and Spark before attempting to launch the job.
-
-This is configured to run via makefile.
-
-\textbf{Part 3a: Decision Tree}
-
-\begin{itemize}
-    \item Run the Decision Tree program:
-    \begin{itemize}
-        \item \texttt{\$ make submit\_DecisionTree}
-    \end{itemize}
-
-    \item The output will be placed in:
-    \begin{itemize}
-        \item \texttt{DecisionTree/output}
-    \end{itemize}
-
-    \item View the output:
-    \begin{itemize}
-        \item \texttt{\$ cat DecisionTree/output/*.csv}
-    \end{itemize}
-
-    \item To clean the files when complete:
-    \begin{itemize}
-        \item \texttt{\$ make clean\_DecisionTree}
-    \end{itemize}
-\end{itemize}
-
-\textbf{Part 3b: Logistic Regression}
-
-\begin{itemize}
-    \item Run the Logistic Regression program:
-    \begin{itemize}
-        \item \texttt{\$ make submit\_LogisticRegression}
-    \end{itemize}
-
-    \item The output will be placed in:
-    \begin{itemize}
-        \item \texttt{LogisticRegression/output}
-    \end{itemize}
-
-    \item View the output:
-    \begin{itemize}
-        \item \texttt{cat LogisticRegression/output/*.csv}
-    \end{itemize}
-
-    \item To clean the files when complete:
-    \begin{itemize}
-        \item \texttt{\$ make clean\_LogisticRegression}
-    \end{itemize}
-\end{itemize}
-
-
-\textbf{Optional Variant modes:}
-
-Runs spark wordcount
-
-\begin{itemize}
-    \item \texttt{\$ make submit\_SparkWordCount}
-\end{itemize}
-
-To Run all modes
-
-\begin{itemize}
-    \item \texttt{\$ make all}
-\end{itemize}
-
-The output(s) will be placed in:
-
-\begin{itemize}
-    \item \texttt{DecisionTree/output}
-    \item \texttt{LogisticRegression/output}
-    \item \texttt{SparkWordCount/output}
-\end{itemize}
-
-\begin{itemize}
-    \item \texttt{\$ cat DecisionTree/output/*.csv}
-    \item \texttt{\$ cat LogisticRegression/output/*.csv}
-    \item \texttt{\$ cat SparkWordCount/output/*.csv}
-\end{itemize}
-
-To clean the files when complete:
-
-\begin{itemize}
-    \item \texttt{\$ make clean\_DecisionTree}
-    \item \texttt{\$ make clean\_LogisticRegression}
-    \item \texttt{\$ make clean\_SparkWordCount}
-\end{itemize}
-
-or
-
-\begin{itemize}
-    \item \texttt{\$ make clean}
-\end{itemize}
+See project folder.
 
 \subsection{Report the training and test results including the max, min,
 average accuracy and the standard deviation obtained from the 10 runs,
 and the running time of each program.}
 
 \subsubsection{Decision Tree:}
+
+The Decision Tree produced consistently high test accuracy (mean 94.54\%, SD0.20) across the ten runs, the spread of training to test gaps was small enough that sometimes the test score was higher than the training score. This could be because the depth cap (spark default depth=5) prevented overfitting, with the remaining variation coming mostly from the random split rather than from the model. The top of the learned tree consistently splits on features 4, 35 and 39 which indicates that a few features contain the most relevant information. 
 
 
 \begin{table}[H]
@@ -263,6 +122,10 @@ Test accuracy (\%)     & 94.57 & 0.21 & 94.37 & 95.06 \\
 \subsubsection{Logistic Regression:}
 
 
+Logistic Regression performed slightly worse (mean test accuracy 94.15\%, SD0.17) and had a slightly bigger test train gap of ~0.2. The categorical columns were one hot encoded so the gap is unlikely to be a preprocessing artefact, it is potentially a result of Logistic Regression’s limited ability to capture non-linear interactions between features that the Decision Tree can capture with successive splits. The model had stable performance across seeds which suggests that the gap between the training and test performance is due to the model itself, not a specific train/test partition.
+
+
+
 \begin{table}[H]
 \centering
 \caption{Summary of logistic regression accuracy over 10 runs.}
@@ -275,6 +138,15 @@ Test accuracy (\%)     & 94.15 & 0.17 & 93.93 & 94.37 \\
 \hline
 \end{tabular}
 \end{table}
+
+
+\subsubsection{Comparison}
+
+
+In this case the Decision Tree is more accurate and approximately twice as fast as Logistic Regression (Decision Tree test accuracy ranged from 94.37\% - 95.06\% with a run time of 65.4s and Logistic Regression test accuracy ranged from 93.93\% - 94.37\% with a run time of 129.3s).The test accuracy gap between DT and LR could be explained by non linear feature interactions within the data that the Decision Tree can capture in tree construction that Logistic Regression cannot. Or as a result of the lack of tuning of the regularisation parameter in the Logistic Regression. The difference in runtime is reflective of how the two algorithms are executed in spark.The decision tree can be optimised in its execution more than the logistic regression model which could potentially be the reason it ran faster. The Decision Tree model also has less features to process than the Logistic Regression model which was one hot encoded and could therefore have contributed to slower completion time. The decision tree output offers more interpretability and better handles mixed feature types.
+
+We evaluated only a single hyperparameter configuration per model (Default depth for DT, Default settings for LR, 70/30 train-test split and 10 seeds), it is possible that further tuning of either model could shift the comparison in accuracy however the difference in time is a product of how the models perform in spark and is unlikely to change significantly.
+
 
 \begin{table}[H]
 \centering
