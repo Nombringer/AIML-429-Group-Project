@@ -291,9 +291,12 @@ local_$(LR_NAME):
 	spark-submit --name $(LR_NAME) \
 	  --master "local[*]"  \
 	  $(LR_EXEC) \
+	  $(LR_NUM_RUNS) \
 	  $(LR_INPUT) \
 	  $(LR_STAGED_OUTPUT_DIR) 2>&1
+	-mkdir -p $(LR_OUTPUT_DIR)
 	cp $(LR_STAGED_OUTPUT_DIR)/* $(LR_OUTPUT_DIR)
+	cat $(LR_OUTPUT_DIR)/*.csv
 	touch $(LR_OUTPUT)
 
 $(LR_HDFS_SENTINEL): | $(LR_CHECK)
