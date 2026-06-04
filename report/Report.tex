@@ -74,7 +74,7 @@ using a different seed to split the dataset into a training and a test set.}
 \State Index required columns
 \State One-hot encode required columns
 \State Assemble into feature columns
-\State Append parameterised DecitionTree model as the final stage.
+\State Append parameterised DecisionTree model as the final stage.
 \Statex \textbf{Run the pipeline:}
 \State Split the test/training data into num\_runs instances
 \State Foreach training data, train a model
@@ -107,10 +107,12 @@ email: \texttt{campberebe3@myvuw.ac.nz}, \texttt{dayfabi@myvuw.ac.nz}, \texttt{p
 How to Install and Run Group22's Decision Tree and Logistic Regression code on the Hadoop cluster
 
 Important note on Makefile:
+This project uses a makefile. A makefile is the most efficient way to ensure all required setup, admin and installation tasks have been successfully executed before attempting to run code. This is particularly important when working in a group to ensure everyone has the same setup when running or writing code. The makefile for this includes hadoop setup, java8, kinit and sparkclasspath setup. Please read the makefile for further information.
 
 \textbf{Part 1: Setup \& Environment}
 
 \begin{enumerate}
+    \item Ensure that you have an ECS user account and can either access the lab or SSH in via username@entry.ecs.vuw.ac.nz and then into a cluster machine
     \item Ensure that you have a user directory on the HDFS cluster (if you do not have one, create one)
     \item Download the submitted Tarball into a folder on your ECS desktop
     \item Extract the tarball (alternatively you can clone our git repo)
@@ -135,9 +137,9 @@ Directories:
     \item \texttt{LogisticRegression/staged\_output} - where local runs place their output instead of HDFS
 
     \item \texttt{ecs\_hadoop\_env} - the ECS cluster Hadoop makefile variables
-    \item \texttt{ecs\_spart\_env} - the ECS cluster Spark makefile variables
+    \item \texttt{ecs\_spark\_env} - the ECS cluster Spark makefile variables
     \item \texttt{local\_hadoop\_env} - the Hadoop makefile variables for local execution
-    \item \texttt{local\_spark\_env} - the Hadoop makefile variables for local execution
+    \item \texttt{local\_spark\_env} - the Spark makefile variables for local execution
 \end{itemize}
 
 \textbf{Part 3: How to run the code}
@@ -146,7 +148,7 @@ The makefile supports two execution modes, ecs and local, picked via a ENV envir
 
 The makefile will ensure proper configured access to kerberos, HDFS and Spark before attempting to launch the job.
 
-This is configured to run via makefile. To run a variant:
+This is configured to run via makefile.
 
 \textbf{Part 3a: Decision Tree}
 
@@ -195,6 +197,7 @@ This is configured to run via makefile. To run a variant:
         \item \texttt{\$ make clean\_LogisticRegression}
     \end{itemize}
 \end{itemize}
+
 
 \textbf{Optional Variant modes:}
 
