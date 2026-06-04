@@ -60,9 +60,13 @@ cat LogisticRegression/output/*.csv
 To clean the files when complete:
 $ make clean_LogisticRegression
 
-Optional Variant modes:
+Running the tutorial:
+
 Runs spark wordcount
 $ make submit_SparkWordCount
+
+Running all scripts:
+
 To Run all modes
 $ make all
 
