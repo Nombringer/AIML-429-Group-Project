@@ -266,6 +266,7 @@ LR_CHECK=$(LR_NAME)_check
 $(LR_CHECK): | kinit_check hdfs_check spark_check
 
 clean_$(LR_NAME): | $(LR_CHECK)
+	echo "Cleaning LogisticRegression generated files"
 	-hdfs dfs -rm $(LR_INPUT)
 	-hdfs dfs -rm "$(LR_OUTPUT_DIR)/*"
 	-hdfs dfs -rmdir $(LR_INPUT_DIR)
@@ -278,6 +279,7 @@ clean_$(LR_NAME): | $(LR_CHECK)
 	-rm $(LR_STAGED_OUTPUT_DIR)/*
 	-rm $(LR_STAGED_OUTPUT_DIR)/.*
 	-rmdir $(LR_STAGED_OUTPUT_DIR)
+
 
 submit_$(LR_NAME): $(LR_OUTPUT)
 
@@ -337,11 +339,6 @@ $(LR_OUTPUT): $(LR_HDFS_SENTINEL) $(LR_PUSH_SENTINEL) $(LR_EXEC) | $(LR_CHECK)
 	hdfs dfs -get "$(LR_OUTPUT_DIR)/*" $(LR_OUTPUT_DIR)
 	touch $(LR_OUTPUT)
 
-clean_$(LR_NAME):
-	echo "Cleaning LogisticRegression generated files"
-	-rm -rf $(LR_STAGED_OUTPUT_DIR)
-	-rm -rf $(LR_OUTPUT_DIR)
-	-rm -rf $(LR_SENTINEL_DIR)
 
 
 all: submit_$(SCRIPT_NAME) submit_$(DT_NAME) submit_$(LR_NAME)
